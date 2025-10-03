@@ -5,6 +5,7 @@ import com.microjob.microjob_exchange.service.JwtUtil;
 import com.microjob.microjob_exchange.repository.UserRepository;
 import com.microjob.microjob_exchange.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -57,17 +58,35 @@ public class AuthController {
 
     //login
     @PostMapping("/api/signin")
-    public ResponseEntity<?> login(@RequestBody User loginRequest)
-    {
-        //Authentication
-        Authentication authentication=authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(loginRequest.getEmail(),loginRequest.getPassword()));
+    public ResponseEntity<?> login(@RequestBody User loginRequest) {
+        // 1. Authentication Check
+        Authentication authentication = authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(loginRequest.getEmail(), loginRequest.getPassword())
+        );
 
         SecurityContextHolder.getContext().setAuthentication(authentication);
 
-        //generate JWT token
-        String token =jwtUtil.generateToken(loginRequest.getId(),loginRequest.getEmail(),loginRequest.getRole());
-        return ResponseEntity.ok("Bearer "+token);
+        // 2. RETRIEVE FULL USER OBJECT from DB using the authenticated email
+        String authenticatedEmail = authentication.getName(); // Use the authenticated principal's name/email
 
+        Optional<User> userOptional = userRepository.findByEmail(authenticatedEmail);
+
+        if (!userOptional.isPresent()) {
+            // This should ideally never happen after successful authentication
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("User data not found after authentication.");
+        }
+
+        User user = userOptional.get();
+        System.out.println("DEBUG FINAL CHECK: User ID being packaged in JWT: " + user.getId());
+
+        // 3. GENERATE JWT TOKEN using the retrieved user data
+        String token = jwtUtil.generateToken(
+                user.getId(),    // Correct ID
+                user.getEmail(), // Correct Email
+                user.getRole()   // Correct Role (e.g., "TASK_UPLOADER")
+        );
+
+        return ResponseEntity.ok("Bearer " + token);
     }
     //current user
 
@@ -88,4 +107,5 @@ public class AuthController {
 
         }
     }
+
 

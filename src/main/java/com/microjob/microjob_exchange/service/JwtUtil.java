@@ -1,5 +1,6 @@
 package com.microjob.microjob_exchange.service;
 
+
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.Jwts;
@@ -33,7 +34,14 @@ public class JwtUtil {
     public String extractEmail(String token){
         return extractAllClaims(token).getSubject();
     }
+    public Long extractId(String token) {
+        return extractAllClaims(token).get("id", Long.class);
+    }
 
+    // Method to extract the role string (which includes the "ROLE_" prefix)
+    public String extractRole(String token) {
+        return extractAllClaims(token).get("role", String.class);
+    }
     //extract all claims
     private Claims extractAllClaims(String token)
     {

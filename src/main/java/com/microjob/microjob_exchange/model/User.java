@@ -5,6 +5,9 @@ import jakarta.persistence.*;
 
 //used for creating shortcuts in boiler plate
 import lombok.AllArgsConstructor;
+import java.util.List;
+import com.microjob.microjob_exchange.model.Task;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
@@ -37,6 +40,17 @@ public class User {
     @Column(nullable = false)
     private LocalDateTime createdAt=LocalDateTime.now();
 
+    @OneToMany(mappedBy = "poster", cascade = CascadeType.ALL, orphanRemoval = true)
+    @JsonIgnore // <--- CRITICAL: Prevents StackOverflowError during serialization
+    private List<Task> postedTasks;
+
+    @OneToMany(mappedBy = "acceptor")
+    @JsonIgnore // <--- Add this if this field exists!
+    private List<Task> acceptedTasks;
+
+    @OneToMany(mappedBy = "applicant", cascade = CascadeType.ALL)
+    @JsonIgnore // <--- Must be present!
+    private List<Application> myApplications;
     public String getName() {
         return name;
     }
