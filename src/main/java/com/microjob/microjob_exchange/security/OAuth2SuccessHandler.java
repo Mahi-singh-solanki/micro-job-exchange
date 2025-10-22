@@ -59,7 +59,7 @@ public class OAuth2SuccessHandler extends SimpleUrlAuthenticationSuccessHandler 
 
         // **URL TO CHANGE:** Replace 'http://localhost:3000' with your actual frontend address (e.g., http://127.0.0.1:5173)
         // This is the frontend route that will capture the JWT token from the URL
-        String frontendCallbackUrl = "http://localhost:5173/oauth/callback?token=" + token;
+        String frontendCallbackUrl = "https://quickgig-microjob.vercel.app/oauth/callback?token=" + token;
 
         // Use the built-in redirect strategy (HTTP 302)
         getRedirectStrategy().sendRedirect(request, response, frontendCallbackUrl);
