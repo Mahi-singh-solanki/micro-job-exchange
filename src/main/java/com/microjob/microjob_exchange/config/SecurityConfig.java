@@ -54,20 +54,20 @@ public class SecurityConfig {
                 .authorizeHttpRequests(auth -> auth
                         // Public/Auth Endpoints
                         .requestMatchers("/auth/**", "/oauth2/**","/api/signin").permitAll()
-
                         // TASK MANAGEMENT ENDPOINTS
                         // POST /api/tasks: Only the uploader role can create a new task
-                        .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER","ROLE_ADMIN")
                         // GET /api/tasks & GET /api/tasks/{id}: Uploader and Worker can view
-                        .requestMatchers(HttpMethod.GET, "/api/tasks", "/api/tasks/*").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER")
+                        .requestMatchers(HttpMethod.GET, "/api/tasks", "/api/tasks/*").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER","ROLE_ADMIN")
                         // POST /api/tasks/{id}/apply: Only the worker role can apply
-                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/apply").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER")
+                        .requestMatchers(HttpMethod.POST, "/api/tasks/*/apply").hasAnyAuthority("ROLE_TASK_UPLOADER", "ROLE_WORKER","ROLE_ADMIN")
                         // Existing Role-Based Access
-                        .requestMatchers("/admin/**").hasRole("ADMIN")
+                        .requestMatchers("/api/admin/**").hasRole("ADMIN")
                         .requestMatchers("/worker/**").hasRole("WORKER")
                         .requestMatchers("/uploader/**").hasRole("TASK_UPLOADER")
                         .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN", "WORKER", "TASK_UPLOADER")
-
+                        .requestMatchers("/ws/**").permitAll()
+                        .requestMatchers("/api/chat/**").authenticated()
                         // Fallback: Protect all other requests
                         .anyRequest().authenticated()
                 )
@@ -88,7 +88,7 @@ public class SecurityConfig {
     @Bean
     protected CorsConfigurationSource corsConfigurationSource() {
         final CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000","http://127.0.0.1:3000"));
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173","http://127.0.0.1:3000"));
         configuration.setAllowedMethods(Arrays.asList("HEAD", "GET", "POST", "PUT", "DELETE", "PATCH"));
         configuration.setAllowCredentials(true);
         configuration.setAllowedHeaders(Arrays.asList(

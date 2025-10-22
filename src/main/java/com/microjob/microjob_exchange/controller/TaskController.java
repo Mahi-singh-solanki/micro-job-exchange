@@ -1,5 +1,7 @@
 package com.microjob.microjob_exchange.controller;
 import com.microjob.microjob_exchange.DTO.TaskApplyRequest;
+import com.microjob.microjob_exchange.model.Review;
+import com.microjob.microjob_exchange.DTO.ReviewRequest;
 import com.microjob.microjob_exchange.DTO.TaskAssignmentRequest;
 import com.microjob.microjob_exchange.model.Application;
 import com.microjob.microjob_exchange.DTO.TaskCreationRequest;
@@ -51,7 +53,8 @@ public class TaskController {
     // 2. GET /api/tasks (Get All Tasks)
     @GetMapping
     public ResponseEntity<List<Task>> getAllTasks() {
-        List<Task> tasks = taskService.getAllOpenTasks();
+        // Call the updated method (which is now returning ALL tasks)
+        List<Task> tasks = taskService.getAllTasks();
         return ResponseEntity.ok(tasks);
     }
 
@@ -78,6 +81,18 @@ public class TaskController {
         List<Application> applications = taskService.getApplicationsByTaskId(taskId, posterId);
         return ResponseEntity.ok(applications);
     }
+    @GetMapping("/my-applications")
+    public ResponseEntity<List<Application>> getMyApplications() {
+        // 1. Get the current user's ID from the JWT token
+        Long applicantId = getUserIdFromAuthContext();
+
+        // 2. Call the new service method
+        List<Application> applications = taskService.getMyApplications(applicantId);
+
+        // 3. Return the list
+        return ResponseEntity.ok(applications);
+    }
+
     @PostMapping("/{taskId}/assign")
     public ResponseEntity<Task> assignTask(@PathVariable Long taskId, @RequestBody TaskAssignmentRequest request) {
         Long posterId = getUserIdFromAuthContext();
@@ -96,4 +111,17 @@ public class TaskController {
         Task updatedTask = taskService.payTask(taskId, posterId);
         return ResponseEntity.ok(updatedTask);
     }
+    @PostMapping("/{taskId}/review")
+    public ResponseEntity<Review> submitReview(@PathVariable Long taskId,
+                                               @RequestBody ReviewRequest request) {
+
+        Long reviewerId = getUserIdFromAuthContext(); // User submitting the review
+
+        Review newReview = taskService.submitReview(taskId, reviewerId, request);
+
+        return new ResponseEntity<>(newReview, HttpStatus.CREATED);
+    }
+
+    // Optional: Endpoint to view a user's rating profile
+
 }

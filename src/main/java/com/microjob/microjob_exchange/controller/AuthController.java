@@ -1,11 +1,14 @@
 package com.microjob.microjob_exchange.controller;
 
+import com.microjob.microjob_exchange.model.PasswordResetToken;
+import com.microjob.microjob_exchange.service.PasswordResetService;
 import com.microjob.microjob_exchange.model.User;
 import com.microjob.microjob_exchange.service.JwtUtil;
 import com.microjob.microjob_exchange.repository.UserRepository;
 import com.microjob.microjob_exchange.service.AuthService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
+import java.util.Map;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -35,6 +38,9 @@ public class AuthController {
     @Autowired
     private AuthService authService;
 
+
+    @Autowired
+    private PasswordResetService passwordResetService;
     //signup
     @PostMapping("/auth/signup")
     public ResponseEntity<?> registerUser(@RequestBody User userRequest){
@@ -106,6 +112,28 @@ public class AuthController {
         return user.<ResponseEntity<?>>map(ResponseEntity::ok).orElseGet(()->ResponseEntity.status(404).body("User not found"));
 
         }
+    @PostMapping("/auth/request-otp")
+    public ResponseEntity<?> requestPasswordReset(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        passwordResetService.generateAndSendToken(email);
+        return ResponseEntity.ok().body("Verification code sent to email.");
+    }
+
+    @PostMapping("/auth/verify-otp")
+    public ResponseEntity<?> verifyOtp(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String code = request.get("code");
+        passwordResetService.validateOtp(email, code);
+        return ResponseEntity.ok().body("Code verified successfully.");
+    }
+
+    @PostMapping("/auth/reset-password")
+    public ResponseEntity<?> resetPassword(@RequestBody Map<String, String> request) {
+        String email = request.get("email");
+        String newPassword = request.get("newPassword");
+        passwordResetService.resetPassword(email, newPassword);
+        return ResponseEntity.ok().body("Password reset successful. Please log in.");
+    }
     }
 
 

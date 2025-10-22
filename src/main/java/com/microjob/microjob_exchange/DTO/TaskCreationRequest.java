@@ -27,4 +27,10 @@ public class TaskCreationRequest {
 
     @Positive(message = "Duration must be positive and in minutes")
     private Integer durationMinutes;
+
+    @NotBlank(message = "Contact email is required for the poster.")
+    private String contactEmail; // <-- NEW FIELD
+
+    @NotBlank(message = "Phone number is required for the poster.")
+    private String contactPhoneNumber; //
 }

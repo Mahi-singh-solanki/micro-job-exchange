@@ -11,15 +11,18 @@ import java.util.List;
 @Repository
 public interface ApplicationRepository extends JpaRepository<Application, Long> {
 
-    /**
-     * Finds all applications for a specific task ID (used by the poster).
-     */
-    List<Application> findByTaskId(Long taskId);
+    // Removed simple findByTaskId(Long taskId)
 
-    /**
-     * Finds all applications made by a specific applicant ID (used by the worker).
-     */
+    // --- FIX: DEEP EAGER FETCH FOR MY-APPLICATIONS ---
+    // Loads Application, its Applicant, the Task, and the Poster of the Task.
+    @Query("SELECT a FROM Application a " +
+            "JOIN FETCH a.task t " +      // Load the Task
+            "JOIN FETCH t.poster p " +
+            "LEFT JOIN FETCH t.acceptor w " +// Load the Poster (t.poster is correct)
+            "WHERE a.applicant.id = :applicantId") // Applicant is on Application (a.applicant)
+    List<Application> findByApplicantIdEagerly(@Param("applicantId") Long applicantId);
 
+    // --- METHOD FOR POSTER TO VIEW BIDS (EAGERLY FETCHED) ---
     @Query("SELECT a FROM Application a JOIN FETCH a.task t JOIN FETCH a.applicant u WHERE a.task.id = :taskId")
     List<Application> findByTaskIdEagerly(@Param("taskId") Long taskId);
 }

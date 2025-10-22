@@ -48,10 +48,15 @@ public class Task {
     private Integer durationMinutes; // Time constraint (e.g., 30)
     // -----------------------------------------------
 
+    @Column(name = "poster_contact_email", nullable = true) // <-- NEW FIELD
+    private String posterContactEmail;
+
+    @Column(name = "poster_phone", nullable = true, length = 15) // <-- NEW FIELD
+    private String posterPhoneNumber;
+
     // 2. Change User ID types to Long
     @ManyToOne(fetch = FetchType.LAZY) // FetchType.LAZY is generally better for performance
     @JoinColumn(name = "uploader_id", nullable = false)
-    @JsonIgnore
     private User poster;
 
     // 3. Updated Status Enum (initial status changed)
@@ -61,7 +66,6 @@ public class Task {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "acceptor_id", nullable = true) // nullable=true since it starts null/unassigned
-    @JsonIgnore
     private User acceptor;
 
     @OneToMany(mappedBy = "task", cascade = CascadeType.ALL, orphanRemoval = true)
@@ -170,6 +174,25 @@ public class Task {
     // Setter for Acceptor
     public void setAcceptor(User acceptor) {
         this.acceptor = acceptor;
+    }
+
+    public String getPosterContactEmail() {
+        return posterContactEmail;
+    }
+
+    // Setter for the contact email
+    public void setPosterContactEmail(String posterContactEmail) {
+        this.posterContactEmail = posterContactEmail;
+    }
+
+    // Getter for the phone number
+    public String getPosterPhoneNumber() {
+        return posterPhoneNumber;
+    }
+
+    // Setter for the phone number
+    public void setPosterPhoneNumber(String posterPhoneNumber) {
+        this.posterPhoneNumber = posterPhoneNumber;
     }
 
 }

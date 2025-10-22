@@ -35,6 +35,12 @@ public class Application {
     @Column(name = "proposed_price", nullable = true)
     private BigDecimal proposedPrice; // Optional: if bidding is allowed
 
+    @Column(name = "worker_contact_email", nullable = true) // <-- NEW FIELD
+    private String workerContactEmail;
+
+    @Column(name = "worker_phone", nullable = true, length = 15) // <-- NEW FIELD
+    private String workerPhoneNumber;
+
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private ApplicationStatus status = ApplicationStatus.PENDING;
@@ -47,5 +53,24 @@ public class Application {
         PENDING,
         SELECTED, // Chosen by the poster
         REJECTED
+    }
+
+    public String getWorkerContactEmail() {
+        return workerContactEmail;
+    }
+
+    // Setter for worker contact email
+    public void setWorkerContactEmail(String workerContactEmail) {
+        this.workerContactEmail = workerContactEmail;
+    }
+
+    // Getter for worker phone number
+    public String getWorkerPhoneNumber() {
+        return workerPhoneNumber;
+    }
+
+    // Setter for worker phone number
+    public void setWorkerPhoneNumber(String workerPhoneNumber) {
+        this.workerPhoneNumber = workerPhoneNumber;
     }
 }

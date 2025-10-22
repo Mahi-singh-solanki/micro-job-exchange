@@ -9,6 +9,9 @@ public class TaskAssignmentRequest {
     @NotNull(message = "Application ID is required for assignment")
     private Long applicationId;
 
+    private String workerContactEmail;   // <-- NEW FIELD
+    private String workerPhoneNumber;
+
     // Optional: Could include a final agreed price if negotiation occurred
     // private BigDecimal finalPrice; 
 }
